@@ -10,8 +10,9 @@ param dnsPrefix string = clusterName
 param nodeCount int = 3
 param nodeVMSize string = 'Standard_D2s_v3'
 param nodePoolName string = 'defaultpool'
-param kubeVersion string = '1.22.6'
+param kubeVersion string = '1.21.7'
 param workspaceName string = 'la-${uniqueString(resourceGroup().id)}'
+param applicationInsightsName string = 'ai-${uniqueString(resourceGroup().id)}'
 
 param queueNames array = [
   'servicebusperftestjavaqueue'
@@ -122,5 +123,15 @@ resource aks 'Microsoft.ContainerService/managedClusters@2021-09-01' = {
         enabled: true
       }
     }
+  }
+}
+
+resource ai 'Microsoft.Insights/components@2020-02-02' = {
+  name: applicationInsightsName
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: la.id
   }
 }

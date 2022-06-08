@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: servicebusapp
+  name: servicebusapp
+  namespace: servicebus
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: servicebusapp
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: servicebusapp
+    spec:
+      containers:
+      - image: ghcr.io/levi106/servicebus-perf-test-java:main-ms
+        name: servicebusapp
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: ai
+              key: connectionstring
+        - name: SPRING_JMS_SERVICEBUS_CONNECTION-STRING
+          valueFrom:
+            secretKeyRef:
+              name: sb
+              key: connectionstring
+        - name: SPRING_JMS_SERVCIEBUS_IDLE-TIMEOUT
+          value: "60000"
+        - name: SPRING_JMS_SERVICEBUS_PRICING-TIER
+          value: "standard"
+        - name: INTERVAL
+          value: "200"
